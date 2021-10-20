@@ -1,0 +1,12 @@
+mypy
+black
+pandas
+fastapi
+torch
+numpy
+h5py
+torchvision
+tqdm
+ipykernel
+matplotlib
+nltk
