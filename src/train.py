@@ -4,16 +4,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 import config
 
-def train_epoch(model, iterator, optimizer, criterion):
+
+def train_epoch(model, iterator, optimizer, criterion, device):
     """Runs the training loop for the model.
-        Args:
-            model (nn.Module): Pytorch model object of our defined class.
-            iterator (torch.utils.Data.DataLoader): The iterator for the data.
-            optimizer (torch.optim): The optimization algorithm used to train the model.
-            criterion (torch.nn): The loss function.
-        Returns:
-            epoch_loss (float): The average loss for one epoch on the given dataloader.
-            epoch_acc (float): The average accuracy one the epoch on the given dataloader.
+    Args:
+        model (nn.Module): Pytorch model object of our defined class.
+        iterator (torch.utils.Data.DataLoader): The iterator for the data.
+        optimizer (torch.optim): The optimization algorithm used to train the model.
+        criterion (torch.nn): The loss function.
+    Returns:
+        epoch_loss (float): The average loss for one epoch on the given dataloader.
+        epoch_acc (float): The average accuracy one the epoch on the given dataloader.
     """
     epoch_loss = 0
     losses = []
@@ -21,14 +22,14 @@ def train_epoch(model, iterator, optimizer, criterion):
     model.train()
 
     # for each batch in the dataloader
-    for batch_idx, batch in enumerate(iterator): 
+    for batch_idx, batch in enumerate(iterator):
 
         # Clear out the gradients from the previous batch
-        optimizer.zero_grad() 
+        optimizer.zero_grad()
 
         # move the inputs and the labels to the device.
-        images = batch[0].to(config.device) 
-        captions = batch[1].to(config.device)
+        images = batch[0].to(device)
+        captions = batch[1].to(device)
         lengths = batch[2]
 
         image_embs, txt_embs = model(images, captions, lengths)
@@ -45,11 +46,16 @@ def train_epoch(model, iterator, optimizer, criterion):
         # add the loss and the accuracy for the epoch.
         epoch_loss += loss.item()
         losses.append(loss.item())
-
-        if batch_idx % 500 == 0:
-            message = 'Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                batch_idx * len(batch[0]), len(iterator.dataset),
-                100. * batch_idx / len(iterator), np.mean(losses))
+        print(epoch_loss)
+        print(lengths)
+        break
+        if batch_idx % 5 == 0:
+            message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                batch_idx * len(batch[0]),
+                len(iterator.dataset),
+                100.0 * batch_idx / len(iterator),
+                np.mean(losses),
+            )
 
             print(message)
             losses = []
@@ -57,73 +63,79 @@ def train_epoch(model, iterator, optimizer, criterion):
     return epoch_loss / len(iterator)
 
 
-def validate_epoch(model, iterator, criterion):
+def validate_epoch(model, iterator, criterion, device):
     """Runs the evaluation loop for the model.
-        Args:
-            model (nn.Module): Pytorch model object of our defined class.
-            iterator (torch.utils.Data.DataLoader): The iterator for the data.
-            criterion (torch.nn): The loss function.
-            device (str): The device which is available, it can be either cuda or cpu.
-        Returns:
-            epoch_loss (float): The average loss for the epoch on the given dataloader.
-            epoch_acc (float): The average accuracy for the epoch on the given dataloader.
+    Args:
+        model (nn.Module): Pytorch model object of our defined class.
+        iterator (torch.utils.Data.DataLoader): The iterator for the data.
+        criterion (torch.nn): The loss function.
+        device (str): The device which is available, it can be either cuda or cpu.
+    Returns:
+        epoch_loss (float): The average loss for the epoch on the given dataloader.
+        epoch_acc (float): The average accuracy for the epoch on the given dataloader.
     """
     epoch_loss = 0
     losses = []
     # Put the model in the evaluation mode.
     model.eval()
 
-    # Do not calculate the gradients in the evaluaion mode. 
+    # Do not calculate the gradients in the evaluaion mode.
     with torch.no_grad():
 
         # for each batch in the dataloader
         for batch_idx, batch in enumerate(iterator):
 
             # move the inputs and the labels to the device.
-            images = batch[0].to(config.device) 
-            captions = batch[1].to(config.device)
+            images = batch[0].to(device)
+            captions = batch[1].to(device)
             lengths = batch[2]
 
             image_embs, txt_embs = model(images, captions, lengths)
 
             # calculate the loss value using our loss function on this batch
             loss = criterion(image_embs, txt_embs)
-            
+
             # add the loss and the accuracy for the epoch.
             epoch_loss += loss.item()
             losses.append(loss.item())
+            print(lengths)
+            break
 
-            if batch_idx % 500 == 0:
-                message = 'Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    batch_idx * len(batch[0]), len(iterator.dataset),
-                    100. * batch_idx / len(iterator), np.mean(losses))
+            if batch_idx % 5 == 0:
+                message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                    batch_idx * len(batch[0]),
+                    len(iterator.dataset),
+                    100.0 * batch_idx / len(iterator),
+                    np.mean(losses),
+                )
 
                 print(message)
                 losses = []
 
-
     return epoch_loss / len(iterator)
 
 
-def train_and_evaluate(num_epochs, model, train_loader, val_loader, test_loader, optimizer, criterion):
+def train_and_evaluate(
+    num_epochs, model, train_loader, val_loader, test_loader, optimizer, criterion, device
+):
     """Call the train and evaluate function for each of the epoch, print the loss and accuracies.
-        Args:
-            num_epochs (int): The number of epochs for which to train the model.
-            model (nn.Module): Pytorch model object of our defined class.
-            train_loader (torch.utils.Data.DataLoader): The iterator for the training data.
-            val_loader (torch.utils.Data.DataLoader): The iterator for the validation data.
-            test_loader (torch.utils.Data.DataLoader):  The iterator for the test data.
-            optimizer (torch.optim): The optimization algorithm used to train the model.
-            criterion (torch.nn): The loss function.
-            device (str): The device which is available, it can be either cuda or cpu.
-            scheduler (torch.optim.lr_scheduler): The learning rate scheduler
-        Returns:
-            train_set_loss (List[float]): The loss for the training set
-            train_set_acc (List[float]): The accuracy for the training set
-            val_set_loss (List[float]): The loss for the validation set
-            val_set_acc (List[float]): The accuracy for the validation set
-            test_set_loss (List[float]): The loss for the testing set
-            test_set_loss (List[float]): The accuracy for the testing set
+    Args:
+        num_epochs (int): The number of epochs for which to train the model.
+        model (nn.Module): Pytorch model object of our defined class.
+        train_loader (torch.utils.Data.DataLoader): The iterator for the training data.
+        val_loader (torch.utils.Data.DataLoader): The iterator for the validation data.
+        test_loader (torch.utils.Data.DataLoader):  The iterator for the test data.
+        optimizer (torch.optim): The optimization algorithm used to train the model.
+        criterion (torch.nn): The loss function.
+        device (str): The device which is available, it can be either cuda or cpu.
+        scheduler (torch.optim.lr_scheduler): The learning rate scheduler
+    Returns:
+        train_set_loss (List[float]): The loss for the training set
+        train_set_acc (List[float]): The accuracy for the training set
+        val_set_loss (List[float]): The loss for the validation set
+        val_set_acc (List[float]): The accuracy for the validation set
+        test_set_loss (List[float]): The loss for the testing set
+        test_set_loss (List[float]): The accuracy for the testing set
     """
 
     train_set_loss = []
@@ -136,20 +148,19 @@ def train_and_evaluate(num_epochs, model, train_loader, val_loader, test_loader,
     for epoch in range(config.num_epochs):
 
         # Call the training function with the training data loader and save loss and accuracy
-        train_loss= train_epoch(model, train_loader, optimizer, criterion)
+        train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
         train_set_loss.append(train_loss)
         # train_set_acc.append(train_acc)
 
         # scheduler.step()
 
         # Call the evaluation function with the vaidation data laoder and save loss and accuracy
-        valid_loss = validate_epoch(model, val_loader, criterion)
+        valid_loss = validate_epoch(model, val_loader, criterion, device)
         val_set_loss.append(valid_loss)
         # val_set_acc.append(valid_acc)
 
-
         # Call the evaluation function with the test data loader and save loss and accuracy.
-        test_loss = validate_epoch(model, test_loader, criterion)
+        test_loss = validate_epoch(model, test_loader, criterion, device)
         test_set_loss.append(test_loss)
         # test_set_acc.append(test_acc)
 
@@ -159,6 +170,6 @@ def train_and_evaluate(num_epochs, model, train_loader, val_loader, test_loader,
         # print(f'Test. Loss: {test_loss:.3f} |  Val. Acc: {test_acc*100:.2f}%')
 
         print(f"======================EPOCH {epoch}=========================")
-        print(f'Train Loss: {train_loss:.3f}')
-        print(f'Val. Loss: {valid_loss:.3f}')
-        print(f'Test. Loss: {test_loss:.3f}')
+        print(f"Train Loss: {train_loss:.3f}")
+        print(f"Val. Loss: {valid_loss:.3f}")
+        print(f"Test. Loss: {test_loss:.3f}")

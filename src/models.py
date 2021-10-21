@@ -103,9 +103,8 @@ class TextEncoder(nn.Module):
         return features
 
     def init_hidden(self, bs):
-        return torch.zeros((1, bs, self.hidden_dim), requires_grad=True).to(
-            config.device
-        )
+        return torch.zeros((1, bs, self.hidden_dim), requires_grad=True)
+        
 
 class Combined(nn.Module):
     def __init__(self, vocab_size: int):
@@ -114,7 +113,7 @@ class Combined(nn.Module):
             model_name=config.model_name,
             normalise=config.normalise,
             embedding_dim=config.embedding_dim,
-            pretrained=False,
+            pretrained=config.pretrained,
             finetune_full=config.finetune
         )
         self.text_enc = TextEncoder(
@@ -123,9 +122,6 @@ class Combined(nn.Module):
             embedding_dim=config.embedding_dim,
             word_embedding_dim=config.word_embedding_dim,
         )
-
-        self.image_enc.to(config.device)
-        self.text_enc.to(config.device)
 
     def forward(self, images, captions, lengths):
         images = self.image_enc(images)
