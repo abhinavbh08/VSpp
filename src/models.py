@@ -79,6 +79,7 @@ class TextEncoder(nn.Module):
         vocab_size: int,
         embedding_dim: int,
         word_embedding_dim: int,
+        device
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
@@ -88,6 +89,7 @@ class TextEncoder(nn.Module):
         self.word_embedding_dim = word_embedding_dim
         self.embedding = nn.Embedding(self.vocab_size, self.word_embedding_dim)
         self.gru = nn.GRU(self.word_embedding_dim, self.embedding_dim, batch_first=True)
+        self.device = device
 
     def forward(self, inputs, lengths):
         bs = inputs.size(0)
@@ -103,11 +105,11 @@ class TextEncoder(nn.Module):
         return features
 
     def init_hidden(self, bs):
-        return torch.zeros((1, bs, self.hidden_dim), requires_grad=True)
+        return torch.zeros((1, bs, self.hidden_dim), requires_grad=True).to(self.device)
         
 
 class Combined(nn.Module):
-    def __init__(self, vocab_size: int):
+    def __init__(self, vocab_size: int, device):
         super().__init__()
         self.image_enc = ImageEncoder(
             model_name=config.model_name,
@@ -121,6 +123,7 @@ class Combined(nn.Module):
             vocab_size=vocab_size,
             embedding_dim=config.embedding_dim,
             word_embedding_dim=config.word_embedding_dim,
+            device = device
         )
 
     def forward(self, images, captions, lengths):

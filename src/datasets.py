@@ -141,7 +141,7 @@ def get_dataloaders(split: str) -> DataLoader:
         transformations=tfms,
     )
 
-    shuffle = False if split == "train" else False
+    shuffle = True if split == "train" else False
 
     loader = DataLoader(
         dataset=dataset,

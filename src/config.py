@@ -9,7 +9,7 @@ models_folder = "models"
 model_name = "vgg"  # For now vgg and resnet are there.
 normalise = True  # Whether to normlise embeddings obtained from the CNN
 embedding_dim = (
-    512  # This will be then compared with the embeddings obtained from the text model.
+    1024  # This will be then compared with the embeddings obtained from the text model.
 )
 finetune = True
 pretrained = True
@@ -23,4 +23,4 @@ batch_size = 32
 num_workers = 4
 learning_rate = 0.0002
 margin = 0.2
-num_epochs = 100
+num_epochs = 30

@@ -22,7 +22,7 @@ def main():
     val_loader = get_dataloaders(split="val")
     test_loader = get_dataloaders(split="test")
     vocab, vocab_size = get_vocab_size()
-    model = Combined(vocab_size).to(device)
+    model = Combined(vocab_size, device).to(device)
 
     params = list(model.text_enc.parameters())
     params += list(model.image_enc.fc.parameters())

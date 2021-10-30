@@ -46,9 +46,7 @@ def train_epoch(model, iterator, optimizer, criterion, device):
         # add the loss and the accuracy for the epoch.
         epoch_loss += loss.item()
         losses.append(loss.item())
-        print(epoch_loss)
-        print(lengths)
-        break
+
         if batch_idx % 5 == 0:
             message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
                 batch_idx * len(batch[0]),
@@ -98,8 +96,6 @@ def validate_epoch(model, iterator, criterion, device):
             # add the loss and the accuracy for the epoch.
             epoch_loss += loss.item()
             losses.append(loss.item())
-            print(lengths)
-            break
 
             if batch_idx % 5 == 0:
                 message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
