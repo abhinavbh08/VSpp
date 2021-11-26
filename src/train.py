@@ -47,7 +47,7 @@ def train_epoch(model, iterator, optimizer, criterion, device):
         epoch_loss += loss.item()
         losses.append(loss.item())
 
-        if batch_idx % 10 == 0:
+        if batch_idx % 20 == 0:
             message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
                 batch_idx * len(batch[0]),
                 len(iterator.dataset),
@@ -110,7 +110,7 @@ def validate_epoch(model, iterator, criterion, device):
             epoch_loss += loss.item()
             losses.append(loss.item())
 
-            if batch_idx % 10 == 0:
+            if batch_idx % 20 == 0:
                 message = "Validation: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
                     batch_idx * len(batch[0]),
                     len(iterator.dataset),
