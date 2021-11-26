@@ -41,7 +41,7 @@ def i2t(images, captions, npts=None):
 def t2i(images, captions, npts=None):
 
     if npts is None:
-        npts = images.shape[0] / 5
+        npts = images.shape[0] // 5
     ims = np.array([images[i] for i in range(0, len(images), 5)])
 
     ranks = np.zeros(5 * npts)
