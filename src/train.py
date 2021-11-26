@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import config
-
+from evaluate import i2t, t2i
 
 def train_epoch(model, iterator, optimizer, criterion, device):
     """Runs the training loop for the model.
@@ -47,7 +47,7 @@ def train_epoch(model, iterator, optimizer, criterion, device):
         epoch_loss += loss.item()
         losses.append(loss.item())
 
-        if batch_idx % 5 == 0:
+        if batch_idx % 10 == 0:
             message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
                 batch_idx * len(batch[0]),
                 len(iterator.dataset),
@@ -77,6 +77,9 @@ def validate_epoch(model, iterator, criterion, device):
     # Put the model in the evaluation mode.
     model.eval()
 
+    img_embs_full = None
+    cap_embs_full = None
+
     # Do not calculate the gradients in the evaluaion mode.
     with torch.no_grad():
 
@@ -87,8 +90,18 @@ def validate_epoch(model, iterator, criterion, device):
             images = batch[0].to(device)
             captions = batch[1].to(device)
             lengths = batch[2]
+            ids = batch[3]
 
             image_embs, txt_embs = model(images, captions, lengths)
+
+            if img_embs_full is None:
+                img_embs_full = np.zeros((len(iterator.dataset), image_embs.size(1)))
+                cap_embs_full = np.zeros((len(iterator.dataset), txt_embs.size(1)))
+
+
+            ids = list(ids)
+            img_embs_full[ids] = image_embs.data.cpu().numpy().copy()
+            cap_embs_full[ids] = txt_embs.data.cpu().numpy().copy()
 
             # calculate the loss value using our loss function on this batch
             loss = criterion(image_embs, txt_embs)
@@ -97,8 +110,8 @@ def validate_epoch(model, iterator, criterion, device):
             epoch_loss += loss.item()
             losses.append(loss.item())
 
-            if batch_idx % 5 == 0:
-                message = "Train: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+            if batch_idx % 10 == 0:
+                message = "Validation: [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
                     batch_idx * len(batch[0]),
                     len(iterator.dataset),
                     100.0 * batch_idx / len(iterator),
@@ -107,7 +120,11 @@ def validate_epoch(model, iterator, criterion, device):
 
                 print(message)
                 losses = []
-
+    
+    (r1, r5, r10, medr, meanr) = i2t(img_embs_full, cap_embs_full)
+    (r1i, r5i, r10i, medri, meanri) = t2i(img_embs_full, cap_embs_full)
+    print("I2T", r1, r5, r10)
+    print("T2I", r1i, r5i, r10i)
     return epoch_loss / len(iterator)
 
 

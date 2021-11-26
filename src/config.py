@@ -19,7 +19,7 @@ word_embedding_dim = 300
 vocab_path = "models/vocab.pkl"
 
 # Training config
-batch_size = 32
+batch_size = 64
 num_workers = 4
 learning_rate = 0.0002
 margin = 0.2
