@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 import torchvision
 from torchvision import transforms
-from typing import List, Dict, Optional, Tuple, Union
+from typing import Any, List, Dict, Optional, Tuple, Union
 import numpy as np
 from PIL import Image
 import os
@@ -24,15 +24,7 @@ class Flickr30K(Dataset):
         json_name: str,
         split: str,
         vocab_path: str = None,
-        transformations: Optional[
-            List[
-                Union[
-                    torchvision.transforms.ToTensor,
-                    torchvision.transforms.Resize,
-                    torchvision.transforms.ToTensor,
-                ]
-            ]
-        ] = None,
+        transformations: Any = None
     ) -> None:
         """
         Initialize the flickr30k dataset
@@ -69,6 +61,8 @@ class Flickr30K(Dataset):
                 self.items += [
                     (index, pos) for pos in range(len(image_info["sentences"]))
                 ]
+            if len(self.items) == 100:
+                break
         self.transformations = transformations
 
     def __len__(self):
@@ -146,7 +140,8 @@ def get_dataloaders(split: str) -> DataLoader:
         transformations=tfms,
     )
 
-    shuffle = True if split == "train" else False
+    # shuffle = True if split == "train" else False
+    shuffle=False
 
     loader = DataLoader(
         dataset=dataset,
