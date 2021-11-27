@@ -25,6 +25,6 @@ vocab_path = "models/vocab.pkl"
 # Training config
 batch_size = 128
 num_workers = 4
-learning_rate = 0.0008
+learning_rate = 0.002
 margin = 0.2
 num_epochs = 30
