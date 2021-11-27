@@ -11,7 +11,7 @@ models_folder = "models"
 
 # Image Encoder config
 model_name = "vgg"  # For now vgg and resnet are there.
-normalise = True  # Whether to normlise embeddings obtained from the CNN
+normalise = False  # Whether to normlise embeddings obtained from the CNN
 embedding_dim = (
     1024  # This will be then compared with the embeddings obtained from the text model.
 )

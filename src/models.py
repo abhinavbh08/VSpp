@@ -101,7 +101,10 @@ class TextEncoder(nn.Module):
         outputs, hidden = self.gru(embeds, hidden)
         outputs, lengths = pad_packed_sequence(outputs, batch_first=True)
         # Getting the last hidden state for each of the input
-        features = normalise(hidden[-1])
+        features = hidden[-1]
+        if self.normalise:
+            features = normalise(features)
+
         return features
 
     def init_hidden(self, bs):
