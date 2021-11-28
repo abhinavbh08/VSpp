@@ -4,7 +4,7 @@ from torchvision import models
 import torch.nn as nn
 import config
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-
+from torch.autograd import Variable
 
 def normalise(embeddings: torch.Tensor) -> torch.Tensor:
     """
@@ -101,7 +101,11 @@ class TextEncoder(nn.Module):
         outputs, hidden = self.gru(embeds, hidden)
         outputs, lengths = pad_packed_sequence(outputs, batch_first=True)
         # Getting the last hidden state for each of the input
-        features = hidden[-1]
+        I = torch.LongTensor(lengths).view(-1, 1, 1)
+        I = Variable(I.expand(inputs.size(0), 1, self.embedding_dim) - 1)
+        if torch.cuda.is_available():
+            I = I.cuda()
+        features = torch.gather(outputs, 1, I).squeeze(1)
         if self.normalise:
             features = normalise(features)
 
@@ -140,10 +144,10 @@ class Combined(nn.Module):
 # # print(enc(img).shape)
 
 
-# text_enc = TextEncoder(normalise=True, vocab_size=512, embedding_dim=512, word_embedding_dim=300)
+# text_enc = TextEncoder(normalise=True, vocab_size=512, embedding_dim=512, word_embedding_dim=300, device="cpu")
 # txt = torch.arange(10)
 # txt = txt.unsqueeze(0)
-# # text_enc(txt, torch.Tensor([5, 5]))
+# text_enc(txt, torch.Tensor([10]))
 # vse = VSEPP(512)
 # ret = vse(img, txt, torch.Tensor([10]))
 # print("abc")
