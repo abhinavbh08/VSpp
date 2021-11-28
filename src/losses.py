@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+from torch.autograd import Variable
 
 
 class ContrastiveLoss(nn.Module):
@@ -28,10 +29,11 @@ class ContrastiveLoss(nn.Module):
 
         # Loss is taken over different casption and images., so makin the diagonals as 0.
         mask = torch.eye(similarity_matrix.size(0)) > .5
+        I = Variable(mask)
         if torch.cuda.is_available():
-            mask = mask.cuda()
-        cost_captions = cost_captions.masked_fill_(mask, 0)
-        cost_images = cost_images.masked_fill_(mask, 0)
+            I = I.cuda()
+        cost_captions = cost_captions.masked_fill_(I, 0)
+        cost_images = cost_images.masked_fill_(I, 0)
 
         # Take the maximum if only want to consider the hard negatives.
         if self.hard_negative:
