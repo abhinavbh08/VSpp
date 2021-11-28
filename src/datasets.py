@@ -124,10 +124,10 @@ def get_dataloaders(split: str) -> DataLoader:
     # List of the transforms to be applied on each image.
     tfms = transforms.Compose(
         [
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             transforms.Resize(256),
             transforms.CenterCrop(config.size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]
     )
 
