@@ -30,7 +30,7 @@ def train(train_loader, model, epoch, val_loader):
         model.train_start()
 
         # Update the model
-        loss_batch=model.train_emb(*train_data)
+        loss_batch+=model.train_emb(*train_data)
         if i%20 == 0:
             print(len(train_loader), i, loss_batch/(i+1))
 
