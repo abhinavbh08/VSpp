@@ -47,8 +47,6 @@ def read_data(root_path: str, json_name: str) -> List[List[str]]:
         if image_info["split"] == "train":
             for sent in image_info["sentences"]:
                 captions.append(nltk.tokenize.word_tokenize(sent["raw"].lower()))
-        if len(captions) == 100:
-            break
 
     return captions
 

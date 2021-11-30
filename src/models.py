@@ -18,8 +18,8 @@ def normalise(embeddings: torch.Tensor) -> torch.Tensor:
         embeddings: The normalised embeddings
     """
     norm = torch.pow(embeddings, 2).sum(dim=1, keepdim=True).sqrt()
-    X = torch.div(embeddings, norm)
-    return X
+    embeddings = torch.div(embeddings, norm)
+    return embeddings
 
 
 class ImageEncoder(nn.Module):
@@ -38,7 +38,7 @@ class ImageEncoder(nn.Module):
         self.normalise = normalise
 
         if model_name == "vgg":
-            self.model = models.vgg16(pretrained=pretrained)
+            self.model = models.vgg19(pretrained=pretrained)
             if finetune_full == False:
                 self.set_grads_false()
             in_feat = self.model.classifier[6].in_features
