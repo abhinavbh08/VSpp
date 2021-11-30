@@ -41,8 +41,8 @@ class ImageEncoder(nn.Module):
             self.model = models.vgg19(pretrained=pretrained)
             if finetune_full == False:
                 self.set_grads_false()
-            in_feat = self.model.classifier[6].in_features
-
+            in_feat = self.model.classifier._modules['6'].in_features
+            
             # In the original implementation, the original model is broken into twoi parts, features
             # which cn then be normalised and then the fc layer.
             # SO, we will do it their way
