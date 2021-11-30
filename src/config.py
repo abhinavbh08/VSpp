@@ -1,11 +1,11 @@
 # Dataset related config
-root_path = "data/flickr30k_images"
-images_folder = "flickr30k_images"
-json_name = "dataset_flickr30k.json"
+# root_path = "data/flickr30k_images"
+# images_folder = "flickr30k_images"
+# json_name = "dataset_flickr30k.json"
 
-# root_path = ""
-# images_folder = "/kaggle/input/flickr-image-dataset/flickr30k_images/flickr30k_images"
-# json_name = "/kaggle/input/captions/dataset_flickr30k.json"
+root_path = ""
+images_folder = "/kaggle/input/flickr-image-dataset/flickr30k_images/flickr30k_images"
+json_name = "/kaggle/input/captions/dataset_flickr30k.json"
 size = 224
 models_folder = "models"
 
