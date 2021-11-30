@@ -31,8 +31,8 @@ def train(train_loader, model, epoch, val_loader):
 
         # Update the model
         loss_batch+=model.train_emb(*train_data)
-        if i%2 == 0:
-            print(i, loss_batch/i+1)
+        if i%20 == 0:
+            print(len(train_loader), i, loss_batch/(i+1))
 
 def encode_data(model, data_loader):
     """Encode all images and captions loadable by `data_loader`
