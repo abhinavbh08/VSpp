@@ -2,6 +2,9 @@ import torch
 from torch.functional import norm
 from torchvision import models
 import torch.nn as nn
+from losses import ContrastiveLoss
+from torch.nn.utils.clip_grad import clip_grad_norm_
+
 import config
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from torch.autograd import Variable
@@ -132,9 +135,10 @@ class TextEncoder(nn.Module):
         return torch.zeros((1, bs, self.hidden_dim), requires_grad=True).to(self.device)
         
 
-class Combined(nn.Module):
-    def __init__(self, vocab_size: int, device):
-        super().__init__()
+
+class VSE:
+
+    def __init__(self, vocab_size, device):
         self.image_enc = ImageEncoder(
             model_name=config.model_name,
             normalise=config.normalise,
@@ -149,11 +153,82 @@ class Combined(nn.Module):
             word_embedding_dim=config.word_embedding_dim,
             device = device
         )
+        self.grad_clip = 2.0
+        if torch.cuda.is_available():
+            self.image_enc.cuda()
+            self.text_enc.cuda()
 
-    def forward(self, images, captions, lengths):
-        images = self.image_enc(images)
-        captions = self.text_enc(captions, lengths)
-        return images, captions
+        self.criterion = ContrastiveLoss(margin=config.margin)
+        params = list(self.text_enc.parameters())
+        params += list(self.image_enc.fc.parameters())
+        if config.finetune:
+            params += list(self.image_enc.model.parameters())
+        self.params = params
+        self.optimizer = torch.optim.Adam(params, lr=config.learning_rate)
+
+    def train_start(self):
+        self.image_enc.train()
+        self.text_enc.train()
+
+    def val_start(self):
+        self.image_enc.eval()
+        self.text_enc.eval()
+
+    def forward_emb(self, images, captions, lengths):
+        images = Variable(images)
+        captions = Variable(captions)
+        if torch.cuda.is_available():
+            images = images.cuda()
+            captions = captions.cuda()
+
+        # Forward
+        img_emb = self.image_enc(images)
+        cap_emb = self.text_enc(captions, lengths)
+        return img_emb, cap_emb
+
+    def forward_loss(self, img_emb, cap_emb):
+        loss = self.criterion(img_emb, cap_emb)
+        return loss
+
+    def train_emb(self, images, captions, lengths, ids=None, *args):
+        """One training step given images and captions.
+        """
+
+        # compute the embeddings
+        img_emb, cap_emb = self.forward_emb(images, captions, lengths)
+
+        # measure accuracy and record loss
+        self.optimizer.zero_grad()
+        loss = self.forward_loss(img_emb, cap_emb)
+
+        # compute gradient and do SGD step
+        loss.backward()
+        if self.grad_clip > 0:
+            clip_grad_norm_(self.params, self.grad_clip)
+        self.optimizer.step()
+        return loss.item()
+# class Combined(nn.Module):
+#     def __init__(self, vocab_size: int, device):
+#         super().__init__()
+#         self.image_enc = ImageEncoder(
+#             model_name=config.model_name,
+#             normalise=config.normalise,
+#             embedding_dim=config.embedding_dim,
+#             pretrained=config.pretrained,
+#             finetune_full=config.finetune
+#         )
+#         self.text_enc = TextEncoder(
+#             normalise=config.normalise,
+#             vocab_size=vocab_size,
+#             embedding_dim=config.embedding_dim,
+#             word_embedding_dim=config.word_embedding_dim,
+#             device = device
+#         )
+
+#     def forward(self, images, captions, lengths):
+#         images = self.image_enc(images)
+#         captions = self.text_enc(captions, lengths)
+#         return images, captions
 
 # enc = ImageEncoder(model_name=config.model_name, normalise=config.normalise, embedding_dim=config.embedding_dim, pretrained=False)
 # # print(enc.model)
