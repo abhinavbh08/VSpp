@@ -30,7 +30,7 @@ def train(train_loader, model, epoch, val_loader):
         model.train_start()
 
         # Update the model
-        loss_batch+=model.train_emb(*train_data)
+        loss_batch=model.train_emb(*train_data)
         if i%20 == 0:
             print(len(train_loader), i, loss_batch/(i+1))
 
@@ -67,17 +67,17 @@ def encode_data(model, data_loader):
     return img_embs, cap_embs
 
 
-def validate(opt, val_loader, model):
+def validate(val_loader, model):
     # compute the encoding for all the validation images and captions
     img_embs, cap_embs = encode_data(
         model, val_loader)
 
     # caption retrieval
-    (r1, r5, r10, medr, meanr) = i2t(img_embs, cap_embs, measure=opt.measure)
+    (r1, r5, r10, medr, meanr) = i2t(img_embs, cap_embs)
     print(r1, r5, r10)
     # image retrieval
     (r1i, r5i, r10i, medri, meanri) = t2i(
-        img_embs, cap_embs, measure=opt.measure)
+        img_embs, cap_embs)
     print(r1i, r5i, r10i)
     # sum of recalls to be used for early stopping
 
