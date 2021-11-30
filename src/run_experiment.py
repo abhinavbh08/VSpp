@@ -19,8 +19,8 @@ def get_vocab_size():
 
 def main():
     train_loader = get_dataloaders(split="train")
-    val_loader = get_dataloaders(split="train")
-    test_loader = get_dataloaders(split="train")
+    val_loader = get_dataloaders(split="val")
+    test_loader = get_dataloaders(split="test")
     vocab, vocab_size = get_vocab_size()
     model = Combined(vocab_size, device).to(device)
 
@@ -39,7 +39,8 @@ def main():
         test_loader,
         optimizer,
         criterion,
-        device
+        device,
+        params
     )
 
 if __name__ == "__main__":

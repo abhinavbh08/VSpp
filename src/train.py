@@ -2,10 +2,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.utils.clip_grad import clip_grad_norm_
 import config
 from evaluate import i2t, t2i
 
-def train_epoch(model, iterator, optimizer, criterion, device):
+def train_epoch(model, iterator, optimizer, criterion, device, params):
     """Runs the training loop for the model.
     Args:
         model (nn.Module): Pytorch model object of our defined class.
@@ -39,6 +40,8 @@ def train_epoch(model, iterator, optimizer, criterion, device):
 
         # Do backpropagation of the gradients
         loss.backward()
+
+        clip_grad_norm_(params, 2.)
 
         # update the weights
         optimizer.step()
@@ -100,9 +103,10 @@ def validate_epoch(model, iterator, criterion, device):
 
 
             ids = list(ids)
-            img_embs_full[ids] = image_embs.data.cpu().numpy().copy()
-            cap_embs_full[ids] = txt_embs.data.cpu().numpy().copy()
 
+            for i, id in enumerate(ids):
+                img_embs_full[id] = image_embs.data.cpu().numpy().copy()[i]
+                img_embs_full[id] = txt_embs.data.cpu().numpy().copy()[i]
             # calculate the loss value using our loss function on this batch
             loss = criterion(image_embs, txt_embs)
 
@@ -129,7 +133,7 @@ def validate_epoch(model, iterator, criterion, device):
 
 
 def train_and_evaluate(
-    num_epochs, model, train_loader, val_loader, test_loader, optimizer, criterion, device
+    num_epochs, model, train_loader, val_loader, test_loader, optimizer, criterion, device, params
 ):
     """Call the train and evaluate function for each of the epoch, print the loss and accuracies.
     Args:
@@ -161,7 +165,7 @@ def train_and_evaluate(
     for epoch in range(config.num_epochs):
 
         # Call the training function with the training data loader and save loss and accuracy
-        train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
+        train_loss = train_epoch(model, train_loader, optimizer, criterion, device, params)
         train_set_loss.append(train_loss)
         # train_set_acc.append(train_acc)
 

@@ -39,14 +39,14 @@ class Flickr30K(Dataset):
             transforms: Optional list of transforms to be applied on each data point.
         """
         self.root_path = root_path
-        # self.images_path = os.path.join(self.root_path, images_folder)
-        # with open(os.path.join(root_path, json_name), "r") as file:
-        #     self.data = json.load(file)
-
-
-        self.images_path = images_folder
-        with open(json_name, "r") as file:
+        self.images_path = os.path.join(self.root_path, images_folder)
+        with open(os.path.join(root_path, json_name), "r") as file:
             self.data = json.load(file)
+
+
+        # self.images_path = images_folder
+        # with open(json_name, "r") as file:
+        #     self.data = json.load(file)
 
         # Loading the vocab is using an rnn based model.
         self.vocab = None
@@ -61,8 +61,6 @@ class Flickr30K(Dataset):
                 self.items += [
                     (index, pos) for pos in range(len(image_info["sentences"]))
                 ]
-            if len(self.items) == 100:
-                break
         self.transformations = transformations
 
     def __len__(self):
@@ -140,8 +138,7 @@ def get_dataloaders(split: str) -> DataLoader:
         transformations=tfms,
     )
 
-    # shuffle = True if split == "train" else False
-    shuffle=False
+    shuffle = True if split == "train" else False
 
     loader = DataLoader(
         dataset=dataset,

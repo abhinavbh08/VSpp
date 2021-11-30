@@ -5,6 +5,7 @@ import torch.nn as nn
 import config
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from torch.autograd import Variable
+import numpy as np
 
 def normalise(embeddings: torch.Tensor) -> torch.Tensor:
     """
@@ -16,8 +17,9 @@ def normalise(embeddings: torch.Tensor) -> torch.Tensor:
     Returns:
         embeddings: The normalised embeddings
     """
-    l2norm = torch.norm(embeddings, p=2, dim=1, keepdim=True)
-    return torch.div(embeddings, l2norm)
+    norm = torch.pow(embeddings, 2).sum(dim=1, keepdim=True).sqrt()
+    X = torch.div(embeddings, norm)
+    return X
 
 
 class ImageEncoder(nn.Module):
@@ -57,6 +59,8 @@ class ImageEncoder(nn.Module):
             self.fc = nn.Linear(in_feat, embedding_dim)
             self.model.fc = nn.Sequential()
 
+        self.init_weights()
+
     def forward(self, images):
         features = self.model(images)
         features = normalise(features)
@@ -68,6 +72,15 @@ class ImageEncoder(nn.Module):
     def set_grads_false(self):
         for param in self.model.parameters():
             param.requires_grad = False
+
+    def init_weights(self):
+        """Xavier initialization for the fully connected layer
+        """
+        r = np.sqrt(6.) / np.sqrt(self.fc.in_features +
+                                  self.fc.out_features)
+        self.fc.weight.data.uniform_(-r, r)
+        self.fc.bias.data.fill_(0)
+
 
 
 class TextEncoder(nn.Module):
@@ -90,6 +103,10 @@ class TextEncoder(nn.Module):
         self.embedding = nn.Embedding(self.vocab_size, self.word_embedding_dim)
         self.gru = nn.GRU(self.word_embedding_dim, self.embedding_dim, batch_first=True)
         self.device = device
+        self.init_weights()
+
+    def init_weights(self):
+        self.embedding.weight.data.uniform_(-0.1, 0.1)
 
     def forward(self, inputs, lengths):
         bs = inputs.size(0)
