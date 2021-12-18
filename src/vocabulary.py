@@ -46,7 +46,7 @@ def read_data(root_path: str, json_name: str) -> List[List[str]]:
     for index, image_info in enumerate(data):
         if image_info["split"] == "train":
             for sent in image_info["sentences"]:
-                captions.append(nltk.tokenize.word_tokenize(sent["raw"].lower()))
+                captions.append(nltk.tokenize.word_tokenize(str(sent["raw"]).lower()))
 
     return captions
 
@@ -65,8 +65,7 @@ def make_vocab(root_path: str, json_name: str, threshold) -> Vocab:
     count = Counter()
     captions = read_data(root_path=root_path, json_name=json_name)
     for sent in captions:
-        for word in sent:
-            count.update([word])
+        count.update(sent)
 
     words = [word for word, cnt in count.items() if cnt >= threshold]
 
@@ -87,7 +86,6 @@ def main():
     vocab = make_vocab(root_path, json_name, threshold=4)
     with open(os.path.join(config.models_folder, "vocab.pkl"), "wb") as f:
         pickle.dump(vocab, f, pickle.HIGHEST_PROTOCOL)
-
 
 if __name__ == "__main__":
     main()

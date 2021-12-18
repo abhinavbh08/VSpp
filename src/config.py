@@ -15,7 +15,7 @@ normalise = True  # Whether to normlise embeddings obtained from the CNN
 embedding_dim = (
     1024  # This will be then compared with the embeddings obtained from the text model.
 )
-finetune = True
+finetune = False
 pretrained = True
 
 # Text Encoder config

@@ -112,28 +112,21 @@ class TextEncoder(nn.Module):
         self.embedding.weight.data.uniform_(-0.1, 0.1)
 
     def forward(self, inputs, lengths):
-        bs = inputs.size(0)
-        hidden = self.init_hidden(bs)
         embeds = self.embedding(inputs)
-        embeds = pack_padded_sequence(
+        packed = pack_padded_sequence(
             embeds, lengths, batch_first=True, enforce_sorted=False
         )
-        outputs, hidden = self.gru(embeds, hidden)
-        outputs, lengths = pad_packed_sequence(outputs, batch_first=True)
-        # Getting the last hidden state for each of the input
+        outputs, hidden = self.gru(packed)
+        padded = pad_packed_sequence(outputs, batch_first=True)
         I = torch.LongTensor(lengths).view(-1, 1, 1)
         I = Variable(I.expand(inputs.size(0), 1, self.embedding_dim) - 1)
         if torch.cuda.is_available():
             I = I.cuda()
-        features = torch.gather(outputs, 1, I).squeeze(1)
+        out = torch.gather(padded[0], 1, I).squeeze(1)
         if self.normalise:
-            features = normalise(features)
+            out = normalise(out)
 
-        return features
-
-    def init_hidden(self, bs):
-        return torch.zeros((1, bs, self.hidden_dim), requires_grad=True).to(self.device)
-        
+        return out
 
 
 class VSE:

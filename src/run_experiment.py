@@ -25,10 +25,11 @@ def train(train_loader, model, epoch, val_loader):
     # switch to train mode
     model.train_start()
     loss_batch = 0
+
+
     for i, train_data in enumerate(train_loader):
         # Always reset to train mode, this is not the default behavior
         model.train_start()
-
         # Update the model
         loss_batch+=model.train_emb(*train_data)
         if i%20 == 0:

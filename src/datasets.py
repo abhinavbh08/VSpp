@@ -48,7 +48,6 @@ class Flickr30K(Dataset):
         # with open(json_name, "r") as file:
         #     self.data = json.load(file)
 
-        # Loading the vocab is using an rnn based model.
         self.vocab = None
         if vocab_path:
             with open(vocab_path, "rb") as file:
@@ -73,13 +72,13 @@ class Flickr30K(Dataset):
         image_path = os.path.join(self.images_path, image_name)
         image = Image.open(image_path).convert("RGB")
 
-        if self.transformations:
+        if self.transformations is not None:
             image = self.transformations(image)
 
         caption_id = tup_index[1]
         caption = self.data[image_id]["sentences"][caption_id]["raw"]
 
-        caption = nltk.tokenize.word_tokenize(caption.lower())
+        caption = nltk.tokenize.word_tokenize(str(caption).lower())
 
         indexed_caption = [self.vocab(tok) for tok in caption]
         indexed_caption = torch.Tensor(indexed_caption)
@@ -120,14 +119,19 @@ def get_dataloaders(split: str) -> DataLoader:
         split: Whether train, test or validation dataloader is required.
     """
     # List of the transforms to be applied on each image.
-    tfms = transforms.Compose(
-        [
-            transforms.Resize(256),
-            transforms.CenterCrop(config.size),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ]
-    )
+    normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                      std=[0.229, 0.224, 0.225])
+    t_list = []
+    if split == 'train':
+        t_list = [transforms.RandomResizedCrop(config.size),
+                  transforms.RandomHorizontalFlip()]
+    elif split == 'val':
+        t_list = [transforms.Resize(256), transforms.CenterCrop(224)]
+    elif split == 'test':
+        t_list = [transforms.Resize(256), transforms.CenterCrop(224)]
+
+    t_end = [transforms.ToTensor(), normalizer]
+    tfms = transforms.Compose(t_list + t_end)
 
     dataset = Flickr30K(
         root_path=config.root_path,
@@ -150,6 +154,7 @@ def get_dataloaders(split: str) -> DataLoader:
 
     return loader
 
-
 # dl = get_dataloaders("train")
+# for i, (images, captions, lengths, ids) in enumerate(dl):
+#     break
 # print("abc")
