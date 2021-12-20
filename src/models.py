@@ -60,7 +60,7 @@ class ImageEncoder(nn.Module):
                 self.set_grads_false()
             in_feat = self.model.fc.in_features
             self.fc = nn.Linear(in_feat, embedding_dim)
-            self.model.module.fc = nn.Sequential()
+            self.model.fc = nn.Sequential()
 
         self.init_weights()
 
