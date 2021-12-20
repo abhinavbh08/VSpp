@@ -55,12 +55,12 @@ class ImageEncoder(nn.Module):
                 *list(self.model.classifier.children())[:-1]
             )
         elif model_name == "resnet":
-            self.model = models.resnet18(pretrained=pretrained)
+            self.model = models.resnet152(pretrained=pretrained)
             if finetune_full == False:
                 self.set_grads_false()
             in_feat = self.model.fc.in_features
             self.fc = nn.Linear(in_feat, embedding_dim)
-            self.model.fc = nn.Sequential()
+            self.model.module.fc = nn.Sequential()
 
         self.init_weights()
 
