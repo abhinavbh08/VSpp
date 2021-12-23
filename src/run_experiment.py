@@ -24,16 +24,16 @@ def train(train_loader, model, epoch, val_loader):
 
     # switch to train mode
     model.train_start()
-    loss_batch = 0
-
+    loss_batches = 0.0
 
     for i, train_data in enumerate(train_loader):
         # Always reset to train mode, this is not the default behavior
         model.train_start()
         # Update the model
-        loss_batch+=model.train_emb(*train_data)
-        if i%20 == 0:
-            print(len(train_loader), i, loss_batch/(i+1))
+        loss_batches+=model.train_emb(*train_data)
+        if i%100 == 99:
+            print("Epoch: ", epoch , i, len(train_loader), loss_batches / 100)
+            loss_batches = 0.0
 
 def encode_data(model, data_loader):
     """Encode all images and captions loadable by `data_loader`
@@ -61,7 +61,7 @@ def encode_data(model, data_loader):
                 cap_embs[id] = cap_emb.data.cpu().numpy().copy()[i]
 
             # measure accuracy and record loss
-            model.forward_loss(img_emb, cap_emb)
+            # model.forward_loss(img_emb, cap_emb)
 
             del images, captions
 
@@ -81,6 +81,8 @@ def validate(val_loader, model):
         img_embs, cap_embs)
     print(r1i, r5i, r10i)
     # sum of recalls to be used for early stopping
+    curr_score = r1 + r5 + r10 + r1i + r5i + r10i
+    return curr_score
 
 def main():
     train_loader = get_dataloaders(split="train")
@@ -107,11 +109,37 @@ def main():
     #     device,
     #     params
     # )
-
+    best_sum = 0.0
     model = VSE(vocab_size, device)
+    if config.resume_training:
+        checkpoint = torch.load("abc")
+        start_epoch = checkpoint["epoch"]
+        score = checkpoint["best_sum"]
+        model.load_state_dict(checkpoint["model"])
+        print("Loading checkpoint")
+        print(f"Epoch: {start_epoch} , Score: {score}")
+        curr_score = validate(val_loader, model)
+        print("Current score after loading validated model", curr_score)
+
     for epoch in range(config.num_epochs):
+            if epoch == 14:
+                lr = config.learning_rate * 0.1
+                for param_group in model.optimizer.param_groups:
+                    param_group['lr'] = lr
+
             train(train_loader, model, epoch, val_loader)
-            validate(val_loader, model)
+            curr_score = validate(val_loader, model)
+            if curr_score > best_sum:
+                best_sum = curr_score
+                save_model_and_metadata({
+                    "epoch": epoch + 1,
+                    "model": model.state_dict(),
+                    "best_sum": best_sum,
+                })
+
+def save_model_and_metadata(dct_values):
+    print("Saving", dct_values["epoch"], dct_values["model"], dct_values["best_sum"])
+    torch.save(dct_values, "checkpoint.pth.tar")
 
 
 if __name__ == "__main__":

@@ -27,4 +27,5 @@ batch_size = 128
 num_workers = 4
 learning_rate = 0.0002
 margin = 0.2
-num_epochs = 30
+num_epochs = 3
+resume_training = False

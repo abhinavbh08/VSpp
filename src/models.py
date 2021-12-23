@@ -167,6 +167,14 @@ class VSE:
         self.image_enc.eval()
         self.text_enc.eval()
 
+    def state_dict(self):
+        state_dict = [self.image_enc.state_dict(), self.text_enc.state_dict()]
+        return state_dict
+
+    def load_state_dict(self, state_dict):
+        self.image_enc.load_state_dict(state_dict[0])
+        self.text_enc.load_state_dict(state_dict[1])
+
     def forward_emb(self, images, captions, lengths):
         images = Variable(images)
         captions = Variable(captions)
