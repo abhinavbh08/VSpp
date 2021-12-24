@@ -138,7 +138,7 @@ def main():
                 })
 
 def save_model_and_metadata(dct_values):
-    print("Saving", dct_values["epoch"], dct_values["model"], dct_values["best_sum"])
+    print("Saving", dct_values["epoch"], dct_values["best_sum"])
     torch.save(dct_values, "checkpoint.pth.tar")
 
 
