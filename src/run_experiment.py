@@ -111,17 +111,18 @@ def main():
     # )
     best_sum = 0.0
     model = VSE(vocab_size, device)
+    start_epoch = 0
     if config.resume_training:
-        checkpoint = torch.load("abc")
+        checkpoint = torch.load("checkpoint.pth.tar", map_location=device)
         start_epoch = checkpoint["epoch"]
         score = checkpoint["best_sum"]
         model.load_state_dict(checkpoint["model"])
         print("Loading checkpoint")
         print(f"Epoch: {start_epoch} , Score: {score}")
-        curr_score = validate(val_loader, model)
-        print("Current score after loading validated model", curr_score)
+        # curr_score = validate(val_loader, model)
+        # print("Current score after loading validated model", curr_score)
 
-    for epoch in range(config.num_epochs):
+    for epoch in range(start_epoch, config.num_epochs):
             if epoch == 14:
                 lr = config.learning_rate * 0.1
                 for param_group in model.optimizer.param_groups:
