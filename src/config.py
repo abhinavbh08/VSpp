@@ -28,4 +28,4 @@ num_workers = 4
 learning_rate = 0.0002
 margin = 0.2
 num_epochs = 30
-resume_training = False
+resume_training = True

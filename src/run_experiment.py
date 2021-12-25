@@ -119,8 +119,8 @@ def main():
         model.load_state_dict(checkpoint["model"])
         print("Loading checkpoint")
         print(f"Epoch: {start_epoch} , Score: {score}")
-        # curr_score = validate(val_loader, model)
-        # print("Current score after loading validated model", curr_score)
+        best_sum = validate(val_loader, model)
+        print("Current score after loading validated model", best_sum)
 
     for epoch in range(start_epoch, config.num_epochs):
             if epoch == 14:
