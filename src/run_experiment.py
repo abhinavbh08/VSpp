@@ -113,7 +113,9 @@ def main():
     model = VSE(vocab_size, device)
     start_epoch = 0
     if config.resume_training:
-        checkpoint = torch.load("checkpoint.pth.tar", map_location=device)
+        # checkpoint = torch.load("checkpoint.pth.tar", map_location=device)
+        filename = "/kaggle/input/checkpoint/checkpoint.pth.tar"
+        checkpoint = torch.load(filename, map_location=device)
         start_epoch = checkpoint["epoch"]
         score = checkpoint["best_sum"]
         model.load_state_dict(checkpoint["model"])
