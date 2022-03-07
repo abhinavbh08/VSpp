@@ -16,3 +16,11 @@ To install the requirements in already generated requirements.txt, do:
 To add the environment to the jupyter notebook, do:
 
 `python -m ipykernel install --user --name=im2txt`
+
+To run the frontend, do:
+
+`streamlit run src/frontend_streamlit.py`
+
+To run the api, do:
+
+`python src/api.py`
