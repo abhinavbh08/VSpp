@@ -10,3 +10,7 @@ tqdm
 ipykernel
 matplotlib
 nltk
+uvicorn
+python-multipart
+streamlit
+requests

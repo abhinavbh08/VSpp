@@ -4,80 +4,197 @@
 #
 #    pip-compile requirements.in
 #
+altair==4.2.0
+    # via streamlit
 anyio==3.3.2
     # via starlette
 argcomplete==1.12.3
     # via ipykernel
+argon2-cffi==21.3.0
+    # via notebook
+argon2-cffi-bindings==21.2.0
+    # via argon2-cffi
+asgiref==3.5.0
+    # via uvicorn
+astor==0.8.1
+    # via streamlit
+attrs==21.4.0
+    # via
+    #   jsonschema
+    #   streamlit
 backcall==0.2.0
     # via ipython
+backports.zoneinfo==0.2.1
+    # via
+    #   pytz-deprecation-shim
+    #   tzlocal
+base58==2.1.1
+    # via streamlit
 black==21.9b0
     # via -r requirements.in
+bleach==4.1.0
+    # via nbconvert
+blinker==1.4
+    # via streamlit
 cached-property==1.5.2
     # via h5py
+cachetools==5.0.0
+    # via streamlit
+certifi==2021.10.8
+    # via requests
+cffi==1.15.0
+    # via argon2-cffi-bindings
+charset-normalizer==2.0.12
+    # via requests
 click==8.0.2
     # via
     #   black
     #   nltk
+    #   streamlit
+    #   uvicorn
 cycler==0.10.0
     # via matplotlib
 debugpy==1.5.0
     # via ipykernel
 decorator==5.1.0
-    # via ipython
+    # via
+    #   ipython
+    #   validators
+defusedxml==0.7.1
+    # via nbconvert
 entrypoints==0.3
-    # via jupyter-client
+    # via
+    #   altair
+    #   jupyter-client
+    #   nbconvert
 fastapi==0.70.0
     # via -r requirements.in
+gitdb==4.0.9
+    # via gitpython
+gitpython==3.1.26
+    # via streamlit
+h11==0.13.0
+    # via uvicorn
 h5py==3.4.0
     # via -r requirements.in
 idna==3.2
-    # via anyio
+    # via
+    #   anyio
+    #   requests
 importlib-metadata==4.8.1
     # via
     #   argcomplete
     #   click
     #   ipykernel
+    #   jsonschema
+importlib-resources==5.4.0
+    # via jsonschema
 ipykernel==6.4.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   ipywidgets
+    #   notebook
+    #   pydeck
 ipython==7.28.0
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
 ipython-genutils==0.2.0
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
+    #   nbformat
+    #   notebook
+ipywidgets==7.6.5
+    # via pydeck
 jedi==0.18.0
     # via ipython
+jinja2==3.0.3
+    # via
+    #   altair
+    #   nbconvert
+    #   notebook
+    #   pydeck
 joblib==1.1.0
     # via nltk
+jsonschema==4.4.0
+    # via
+    #   altair
+    #   nbformat
 jupyter-client==7.0.6
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   nbclient
+    #   notebook
 jupyter-core==4.8.1
-    # via jupyter-client
+    # via
+    #   jupyter-client
+    #   nbconvert
+    #   nbformat
+    #   notebook
+jupyterlab-pygments==0.1.2
+    # via nbconvert
+jupyterlab-widgets==1.0.2
+    # via ipywidgets
 kiwisolver==1.3.2
     # via matplotlib
+markupsafe==2.0.1
+    # via jinja2
 matplotlib==3.4.3
     # via -r requirements.in
 matplotlib-inline==0.1.3
     # via
     #   ipykernel
     #   ipython
+mistune==0.8.4
+    # via nbconvert
 mypy==0.910
     # via -r requirements.in
 mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
+nbclient==0.5.11
+    # via nbconvert
+nbconvert==6.4.2
+    # via notebook
+nbformat==5.1.3
+    # via
+    #   ipywidgets
+    #   nbclient
+    #   nbconvert
+    #   notebook
 nest-asyncio==1.5.1
-    # via jupyter-client
+    # via
+    #   jupyter-client
+    #   nbclient
+    #   notebook
 nltk==3.6.5
     # via -r requirements.in
+notebook==6.4.8
+    # via widgetsnbextension
 numpy==1.21.2
     # via
     #   -r requirements.in
+    #   altair
     #   h5py
     #   matplotlib
     #   pandas
+    #   pyarrow
+    #   pydeck
+    #   streamlit
     #   torchvision
+packaging==21.3
+    # via
+    #   bleach
+    #   streamlit
 pandas==1.3.3
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   altair
+    #   streamlit
+pandocfilters==1.5.0
+    # via nbconvert
 parso==0.8.2
     # via jedi
 pathspec==0.9.0
@@ -89,44 +206,94 @@ pickleshare==0.7.5
 pillow==8.3.2
     # via
     #   matplotlib
+    #   streamlit
     #   torchvision
 platformdirs==2.4.0
     # via black
+prometheus-client==0.13.1
+    # via notebook
 prompt-toolkit==3.0.20
     # via ipython
+protobuf==3.19.4
+    # via streamlit
 ptyprocess==0.7.0
-    # via pexpect
+    # via
+    #   pexpect
+    #   terminado
+pyarrow==7.0.0
+    # via streamlit
+pycparser==2.21
+    # via cffi
 pydantic==1.8.2
     # via fastapi
+pydeck==0.7.1
+    # via streamlit
 pygments==2.10.0
-    # via ipython
+    # via
+    #   ipython
+    #   jupyterlab-pygments
+    #   nbconvert
+pympler==1.0.1
+    # via streamlit
 pyparsing==2.4.7
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   packaging
+pyrsistent==0.18.1
+    # via jsonschema
 python-dateutil==2.8.2
     # via
     #   jupyter-client
     #   matplotlib
     #   pandas
+    #   streamlit
+python-multipart==0.0.5
+    # via -r requirements.in
 pytz==2021.3
     # via pandas
+pytz-deprecation-shim==0.1.0.post0
+    # via tzlocal
 pyzmq==22.3.0
-    # via jupyter-client
+    # via
+    #   jupyter-client
+    #   notebook
 regex==2021.10.8
     # via
     #   black
     #   nltk
+requests==2.27.1
+    # via
+    #   -r requirements.in
+    #   streamlit
+send2trash==1.8.0
+    # via notebook
 six==1.16.0
     # via
+    #   bleach
     #   cycler
     #   python-dateutil
+    #   python-multipart
+    #   validators
+smmap==5.0.0
+    # via gitdb
 sniffio==1.2.0
     # via anyio
 starlette==0.16.0
     # via fastapi
+streamlit==1.5.1
+    # via -r requirements.in
+terminado==0.13.1
+    # via notebook
+testpath==0.5.0
+    # via nbconvert
 toml==0.10.2
-    # via mypy
+    # via
+    #   mypy
+    #   streamlit
 tomli==1.2.1
     # via black
+toolz==0.11.2
+    # via altair
 torch==1.9.1
     # via
     #   -r requirements.in
@@ -137,6 +304,9 @@ tornado==6.1
     # via
     #   ipykernel
     #   jupyter-client
+    #   notebook
+    #   streamlit
+    #   terminado
 tqdm==4.62.3
     # via
     #   -r requirements.in
@@ -145,9 +315,15 @@ traitlets==5.1.0
     # via
     #   ipykernel
     #   ipython
+    #   ipywidgets
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
+    #   nbclient
+    #   nbconvert
+    #   nbformat
+    #   notebook
+    #   pydeck
 typed-ast==1.4.3
     # via
     #   black
@@ -155,16 +331,41 @@ typed-ast==1.4.3
 typing-extensions==3.10.0.2
     # via
     #   anyio
+    #   argon2-cffi
+    #   asgiref
     #   black
+    #   gitpython
+    #   h11
     #   importlib-metadata
+    #   jsonschema
     #   mypy
     #   pydantic
     #   starlette
+    #   streamlit
     #   torch
+    #   uvicorn
+tzdata==2021.5
+    # via pytz-deprecation-shim
+tzlocal==4.1
+    # via streamlit
+urllib3==1.26.8
+    # via requests
+uvicorn==0.17.5
+    # via -r requirements.in
+validators==0.18.2
+    # via streamlit
+watchdog==2.1.6
+    # via streamlit
 wcwidth==0.2.5
     # via prompt-toolkit
+webencodings==0.5.1
+    # via bleach
+widgetsnbextension==3.5.2
+    # via ipywidgets
 zipp==3.6.0
-    # via importlib-metadata
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

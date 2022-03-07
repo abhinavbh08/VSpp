@@ -49,7 +49,7 @@ def t2i(images, captions, npts=None):
     for index in range(npts):
 
         # Get query captions
-        queries = captions[5 * index:5 * index + 5]
+        queries = captions[5 * index : 5 * index + 5]
 
         d = np.dot(queries, ims.T)
         inds = np.zeros(d.shape)
