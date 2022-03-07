@@ -27,3 +27,7 @@ To run the api, do:
 
 `python src/api.py`
 
+![first half](images/front_page.png "first half")
+
+Now, once we add the text, the images will be added in the order of their similarity.
+![second half](images/second_page.png "second half")
